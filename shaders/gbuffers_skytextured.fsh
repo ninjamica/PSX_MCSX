@@ -53,9 +53,10 @@ void main() {
 		float caveFactor = fogCaveFactor(eyeAltitude, eyeBrightnessSmooth.y, colortex12);
 
 		float upDot = dot(viewDir, gbufferModelView[1].xyz);
-		skytex *= smoothstep(-0.2, 0.0, upDot);
-		skytex *= mix(1.0, fog_sunmoon_rain, rainStrength);
-		skytex *= 1.0 - thunderStrength;
+		skytex *= smoothstep(-0.2, 0.0, upDot)
+			   *  mix(1.0, fog_sunmoon_rain, rainStrength)
+		       *  (1.0 - thunderStrength)
+		       *  caveFactor;
 		
 		skyFogCol = getOverworldSkyColor(viewDir, sunAngle, fogColor, skyColor, rainStrength, gbufferModelView);
 		if(dot(viewDir, normalize(sunPosition)) > 0.5) {
