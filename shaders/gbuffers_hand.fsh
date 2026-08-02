@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 #define gbuffers_solid
 #include "/shaders.settings"
@@ -19,12 +18,16 @@ uniform sampler2D lightmap;
 uniform int heldItemId;
 uniform int heldItemId2;
 uniform ivec2 atlasSize;
+uniform float alphaTestRef;
+
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
 
 void main() {
-	vec4 colorVal = texture2D(texture, texcoord) * color;
+	colorOut = texture2D(texture, texcoord) * color;
 
-	if(colorVal.a < 0.1)
-		discard;
+	if (colorOut.a < alphaTestRef) discard;
 
 	#if Floodfill > 0
 		vec4 lighting = vec4(voxelLightColor, 0.0);
@@ -33,18 +36,17 @@ void main() {
 		vec4 lighting = texture2D(lightmap, lmcoord.xy) * 0.8 + 0.2;
 	#endif
 
-	vec4 col = colorVal * lighting;
+	colorOut *= lighting;
 
 	#ifdef Player_Ignore_Post
 		if(heldItemId == 10002 || (heldItemId2 == 10002 && atlasSize.x == 0)) {
-			vec3 hsv = rgb2hsv(col.rgb);
+			vec3 hsv = rgb2hsv(colorOut.rgb);
 			hsv.y /= saturation;
-			col.rgb = hsv2rgb(hsv);
+			colorOut.rgb = hsv2rgb(hsv);
 
-			col.rgb = (col.rgb - 0.5) * (1.0/contrast) + 0.5;
+			colorOut.rgb = (colorOut.rgb - 0.5) * (1.0/contrast) + 0.5;
 		}
 	#endif
 	
-	gl_FragData[0] = col;
-	gl_FragData[1] = vec4(0.0);
+	textOut = vec4(0.0);
 }

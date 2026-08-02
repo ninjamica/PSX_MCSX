@@ -1,3 +1,6 @@
+#ifndef FOG_GLSL
+#define FOG_GLSL
+
 #include "/shaders.settings"
 #include "/lib/psx_util.glsl"
 
@@ -197,7 +200,7 @@ float getFogDepth(in vec3 viewPos, in float depth1, int isEyeInWater, float near
     fogDistance = mix(fogDistance, fog_distance_blind, blindness);
     fogSlope = mix(fogSlope, fog_slope_blind, blindness);
 
-    return (depth - fogDistance) / fogSlope;
+    return clamp01((depth - fogDistance) / fogSlope);
 }
 
 float fogCaveFactor(float eyeAltitude, float eyeBrightness, sampler2D moodTex) {
@@ -230,3 +233,5 @@ vec3 getFogColor(int isEyeInWater, vec3 skyFogCol, vec3 fogColor) {
 
     return mix(returnFogCol, Blindness_Color, blindness);
 }
+
+#endif

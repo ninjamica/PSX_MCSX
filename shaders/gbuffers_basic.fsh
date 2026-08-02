@@ -18,6 +18,7 @@ uniform int blockEntityId;
 uniform bool inNether;
 uniform bool inEnd;
 uniform vec2 texelSize;
+uniform float alphaTestRef;
 
 #include "/lib/psx_util.glsl"
 #include "/lib/fog.glsl"
@@ -25,15 +26,19 @@ uniform vec2 texelSize;
 varying vec4 color;
 
 /* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
+
 void main() {
 
-	vec4 col = color;
+	if (color.a < alphaTestRef) discard;
+
+	colorOut = color;
 	vec3 viewPos = screenToView(gl_FragCoord.xy*texelSize, gl_FragCoord.z, gbufferProjectionInverse);
 
 	vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col.rgb = mix(col.rgb, fogCol, fogDepth);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	gl_FragData[0] = col;
-	gl_FragData[1] = vec4(0.0);
+	textOut = vec4(0.0);
 }

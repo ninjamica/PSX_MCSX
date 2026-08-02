@@ -21,9 +21,9 @@ const bool colortex12Clear  = false;
 
 #define composite
 #include "/shaders.settings"
+#include "/lib/psx_util.glsl"
 
 #define DITHER_COLORS 128
-// varying vec2 texcoord;
 
 uniform sampler2D colortex10;
 uniform sampler2D colortex1;
@@ -41,6 +41,8 @@ vec3 GetDither(ivec2 pos, vec3 c, float intensity) {
 }
 
 /* RENDERTARGETS: 10 */
+layout(location = 0) out vec4 colorOut;
+
 void main() {
 	ivec2 downscaleCoord = ivec2(gl_FragCoord.xy * resolution_scale);
 
@@ -51,9 +53,9 @@ void main() {
 
     vec3 col = texelFetch(colortex10, ivec2(downscaleCoord / resolution_scale), 0).rgb;
 
-	col = clamp(1.2 * (col - 0.5) + 0.5, 0, 1);
+	col = clamp01(1.2 * (col - 0.5) + 0.5);
 	col = GetDither(downscaleCoord, col, dither_amount);
-	col = clamp(floor(col * color_depth) / color_depth, 0.0, 1.0);
+	col = clamp01(floor(col * color_depth) / color_depth);
 
-	gl_FragData[0].rgb = col;
+	colorOut.rgb = col;
 }

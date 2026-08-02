@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 varying vec4 color;
 
@@ -8,12 +7,18 @@ varying vec2 lmcoord;
 
 uniform sampler2D texture;
 uniform sampler2D lightmap;
+uniform float alphaTestRef;
+
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
 
 void main() {
 
-	vec4 tex = texture2D(texture, texcoord)*color;
-	tex *= texture2D(lightmap, lmcoord);
+	vec4 colorOut = texture2D(texture, texcoord)*color;
+	if (colorOut.a < alphaTestRef) discard;
 
-	gl_FragData[0] = tex;
-	gl_FragData[1] = vec4(0.0);
+	colorOut *= texture2D(lightmap, lmcoord);
+
+	textOut = vec4(0.0);
 }

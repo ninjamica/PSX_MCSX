@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10 */
 
 #define gbuffers_solid
 #include "/shaders.settings"
@@ -9,6 +8,7 @@
 uniform vec2 texelSize;
 uniform sampler2D texture;
 uniform sampler2D lightmap;
+uniform float alphaTestRef;
 
 varying vec2 texcoord;
 varying vec3 texcoordAffine;
@@ -18,6 +18,9 @@ varying vec4 color;
 #if Floodfill > 0
 	varying vec3 voxelLightColor;
 #endif
+
+/* RENDERTARGETS: 10 */
+layout(location = 0) out vec4 colorOut;
 
 void main() {
 
@@ -38,7 +41,7 @@ void main() {
 		vec4 lighting = texture2D(lightmap, lmcoord.xy);
 	#endif
 
-	vec4 col = texture2D(texture, affine) * color * lighting;
-	
-	gl_FragData[0] = col;
+	colorOut = texture2D(texture, affine) * color * lighting;
+
+	if (colorOut.a < alphaTestRef) discard;
 }

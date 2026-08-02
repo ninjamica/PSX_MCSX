@@ -1,7 +1,6 @@
 #version 420 compatibility
 
 uniform float playerMood;
-uniform float playerMoodSmooth;
 
 flat in float moodVelocity;
 flat in float moodAccumulation;

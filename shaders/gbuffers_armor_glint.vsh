@@ -31,7 +31,7 @@ void main() {
 
 		#ifdef aspectRatio_fix
 		if(!(heldItemId == 10001 && heldItemId2 != heldItemId) && abs(position4.x) > 0.2)
-			position4.x -= sign(position4.x) * 0.13 * clamp((aspectRatio - 1.7) / (1.0 - 1.7), 0.0, 1.0) * position4.w;
+			position4.x -= sign(position4.x) * 0.13 * clamp01((aspectRatio - 1.7) / (1.0 - 1.7)) * position4.w;
 		#endif
 		
 		position = PixelSnap(position4, vertex_inaccuracy_hand).xyz;

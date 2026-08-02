@@ -5,6 +5,8 @@ uniform sampler2D colortex5;
 #include "/lib/voxel.glsl"
 
 /* RENDERTARGETS: 5 */
+layout(location = 0) out vec4 dataOut;
+
 void main() {
 
 	ivec2 storagePos = ivec2(gl_FragCoord.xy);
@@ -17,6 +19,6 @@ void main() {
 		
 	light.rgb = (light.a > 0.4) ? (max(light.rgb, propogate)) : (propogate);
 
-	gl_FragData[0] = light;
+	dataOut = light;
 
 }

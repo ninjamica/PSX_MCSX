@@ -31,7 +31,7 @@ void main() {
 	vec3 viewPos = screenToView(screenPos, gl_FragCoord.z, gbufferProjectionInverse);
 
 	vec3 fogCol = texture2D(colortex11, screenPos).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
 	col.rgb = mix(col.rgb, fogCol, fogDepth);
 
 	gl_FragData[0] = col;

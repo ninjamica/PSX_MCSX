@@ -4,7 +4,6 @@
 
 uniform sampler2D colortex12;
 uniform float playerMood;
-uniform float playerMoodSmooth;
 uniform ivec2 eyeBrightness;
 uniform float frameTime;
 

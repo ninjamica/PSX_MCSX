@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 #define gbuffers_solid
 #include "/shaders.settings"
@@ -21,6 +20,7 @@ uniform float far;
 uniform int isEyeInWater;
 uniform bool inNether;
 uniform bool inEnd;
+uniform float alphaTestRef;
 
 #include "/lib/fog.glsl"
 
@@ -34,6 +34,9 @@ varying vec3 viewPos;
 	varying vec3 voxelLightColor;
 #endif
 
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
 
 void main() {
 
@@ -53,12 +56,13 @@ void main() {
 	#else
 		vec4 lighting = texture2D(lightmap, lmcoord) * 0.8 + 0.2;
 	#endif
-	vec4 col = texture2D(texture, affine) * color * lighting;
+	colorOut = texture2D(texture, affine) * color * lighting;
+
+	if (colorOut.a < alphaTestRef) discard;
 
 	vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col.rgb = mix(col.rgb, fogCol, fogDepth);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	gl_FragData[0] = col;
-	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
+	textOut = vec4(0.0, 0.0, 0.0, 1.0);
 }

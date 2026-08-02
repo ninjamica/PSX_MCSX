@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 #define gbuffers_solid
 #include "/shaders.settings"
@@ -44,6 +43,10 @@ varying float isWaterBackface;
 uniform sampler2D texture;
 uniform sampler2D lightmap;
 
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
+
 void main() {
 	#ifdef affine_mapping
 	#ifdef affine_clamp_enabled
@@ -62,7 +65,7 @@ void main() {
 		vec4 lighting = texture2D(lightmap, lmcoord) * 0.8 + 0.2;
 	#endif
 
-	vec4 col = texture2D(texture, affine) * color * lighting;
+	colorOut = texture2D(texture, affine) * color * lighting;
 
 	if (isWaterBackface > 0.5) {
 		vec3 oldCol = texelFetch(colortex10, ivec2(gl_FragCoord.xy), 0).rgb;
@@ -71,17 +74,16 @@ void main() {
 		// vec3 oldFogCol = vec3(10.0);
 
 		vec3 oldViewPos = screenToView(gl_FragCoord.xy / vec2(viewWidth, viewHeight), oldDepth, gbufferProjectionInverse);
-		float oldFogDepth = clamp(getFogDepth(oldViewPos, oldDepth, 1, near, far), 0.0, 1.0);
+		float oldFogDepth = getFogDepth(oldViewPos, oldDepth, 1, near, far);
 		oldCol = mix(oldCol, oldFogCol, oldFogDepth);
 		// oldCol = oldFogCol;
 
-		col = vec4(oldCol, 1.0);
+		colorOut = vec4(oldCol, 1.0);
 	}
 
 	vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col.rgb = mix(col.rgb, fogCol, fogDepth);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	gl_FragData[0] = col;
-	gl_FragData[1] = vec4(0.0);
+	textOut = vec4(0.0);
 }

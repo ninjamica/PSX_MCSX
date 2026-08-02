@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 #define gbuffers_solid
 #define gbuffers_entities
@@ -36,12 +35,17 @@ uniform ivec4 blendFunc;
 uniform int isEyeInWater;
 uniform bool inNether;
 uniform bool inEnd;
+uniform float alphaTestRef;
 
 #include "/lib/fog.glsl"
 
 #if Floodfill > 0
 	varying vec3 voxelLightColor;
 #endif
+
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
 
 void main() {
 	#ifdef affine_mapping
@@ -55,11 +59,11 @@ void main() {
 	#endif
 
 	if(entityId == 10001) {
-		gl_FragData[0] = vec4(1.0);
+		colorOut = vec4(1.0);
 	}
 	else {
-		vec4 col = texture2D(texture, affine) * color;
-		col.rgb = mix(col.rgb, entityColor.rgb, entityColor.a);
+		colorOut = texture2D(texture, affine) * color;
+		colorOut.rgb = mix(colorOut.rgb, entityColor.rgb, entityColor.a);
 		
 		#if Floodfill > 0
 			vec4 lighting = vec4(voxelLightColor, 0.0);
@@ -78,29 +82,29 @@ void main() {
 			lighting.rgb += mix(vec3(item_darkColor), vec3(item_lightColor), sin(frameTimeCounter * item_speed) * 0.5 + 0.5);
 		}
 
-		col *= lighting;
+		colorOut *= lighting;
 
 		#ifdef Player_Ignore_Post
 			if(entityId == 10002) {
-				vec3 hsv = rgb2hsv(col.rgb);
+				vec3 hsv = rgb2hsv(colorOut.rgb);
 				hsv.y /= saturation;
-				col.rgb = hsv2rgb(hsv);
+				colorOut.rgb = hsv2rgb(hsv);
 
-				col.rgb = (col.rgb - 0.5) * (1.0/contrast) + 0.5;
+				colorOut.rgb = (colorOut.rgb - 0.5) * (1.0/contrast) + 0.5;
 			}
 		#endif
 
-		float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
+		float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
 		if(entityId == 10006 && blendFunc.x == 1) {
-			col.rgb *= 1.0-fogDepth;
+			colorOut.rgb *= 1.0-fogDepth;
 		}
 		else {
 			vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-			col.rgb = mix(col.rgb, fogCol, fogDepth);
+			colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 		}
-		
-		gl_FragData[0] = col;
+
+		if (colorOut.a < alphaTestRef) discard;
 	}
 
-	gl_FragData[1] = vec4(0.0);
+	textOut = vec4(0.0);
 }

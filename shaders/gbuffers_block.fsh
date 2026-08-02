@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10,1 */
 
 #define gbuffers_solid
 #include "/shaders.settings"
@@ -26,6 +25,7 @@ uniform int isEyeInWater;
 uniform int blockEntityId;
 uniform bool inNether;
 uniform bool inEnd;
+uniform float alphaTestRef;
 
 #include "/lib/fog.glsl"
 
@@ -39,6 +39,10 @@ varying vec3 viewPos;
 #if Floodfill > 0
 	varying vec3 voxelLightColor;
 #endif
+
+/* RENDERTARGETS: 10,1 */
+layout(location = 0) out vec4 colorOut;
+layout(location = 1) out vec4 textOut;
 
 void main() {
 
@@ -69,22 +73,23 @@ void main() {
 		vec4 lighting =  texture2D(lightmap, lmcoord.xy);
 	#endif
 
-	vec4 col = texture2D(texture, affine) * color * lighting;
+	colorOut = texture2D(texture, affine) * color * lighting;
+
+	if (colorOut.a < alphaTestRef) discard;
 
 	#ifdef Player_Ignore_Post
 		if(blockEntityId == 10002) {
-			vec3 hsv = rgb2hsv(col.rgb);
+			vec3 hsv = rgb2hsv(colorOut.rgb);
 			hsv.y /= saturation;
-			col.rgb = hsv2rgb(hsv);
+			colorOut.rgb = hsv2rgb(hsv);
 
-			col.rgb = (col.rgb - 0.5) * (1.0/contrast) + 0.5;
+			colorOut.rgb = (colorOut.rgb - 0.5) * (1.0/contrast) + 0.5;
 		}
 	#endif
 
 	vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col.rgb = mix(col.rgb, fogCol, fogDepth);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	gl_FragData[0] = col;
-	gl_FragData[1] = vec4(isText, 0.0, 0.0, 1.0);
+	textOut = vec4(isText, 0.0, 0.0, 1.0);
 }

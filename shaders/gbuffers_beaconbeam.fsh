@@ -39,7 +39,7 @@ layout(location = 1) out vec4 textOut;
 
 void main() {
 	vec2 affine = AffineMapping(texcoordAffine, texcoord, texelSize, 2);
-	vec4 col = texture2D(texture, texcoord) * color;
+	colorOut = texture2D(texture, texcoord) * color;
 
 	#if Floodfill > 0 && defined Floodfill_Particles
 		vec4 lighting = vec4(voxelLightColor, 0.0);
@@ -48,14 +48,13 @@ void main() {
 		vec4 lighting = texture2D(lightmap, lmcoord.xy) * 0.8 + 0.2;
 	#endif
 	
-	col *= lighting;
+	colorOut *= lighting;
 
 	vec3 fogCol = texelFetch(colortex11, ivec2(gl_FragCoord.xy), 0).rgb;
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col.rgb = mix(col.rgb, fogCol, fogDepth);
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	if(col.a < 0.9) discard;
+	if(colorOut.a < 0.9) discard;
 
-	colorOut = col;
 	textOut = vec4(0.0, 1.0, 0.0, 1.0);
 }

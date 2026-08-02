@@ -1,5 +1,4 @@
 #version 420 compatibility
-/* RENDERTARGETS: 10 */
  
 #define gbuffers_armor_glint
 #include "/shaders.settings"
@@ -21,12 +20,12 @@ uniform bool inEnd;
 
 #include "/lib/fog.glsl"
 
+/* RENDERTARGETS: 10 */
+layout(location = 0) out vec4 colorOut;
 
 void main() {
-	vec4 col = texture2D(texture, texcoord + vec2(frameTimeCounter/8.0)) * color * enchanted_strength;
+	colorOut = texture2D(texture, texcoord + vec2(frameTimeCounter/8.0)) * color * enchanted_strength;
 
-	float fogDepth = clamp(getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far), 0.0, 1.0);
-	col *= 1.0-fogDepth;
-
-	gl_FragData[0] = col;
+	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
+	colorOut *= 1.0-fogDepth;
 }

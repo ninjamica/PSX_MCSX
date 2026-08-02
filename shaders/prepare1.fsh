@@ -28,6 +28,9 @@ vec3 screenToView(vec3 screenPos) {
 }
 
 /* RENDERTARGETS: 10,11 */
+layout(location = 0) out vec4 skyOut;
+layout(location = 1) out vec4 fogOut;
+
 void main() {
 	
 	vec3 skyFogCol;
@@ -48,6 +51,6 @@ void main() {
 
 	vec3 fogCol = getFogColor(isEyeInWater, skyFogCol, fogColor);
 
-	gl_FragData[0] = vec4(fogCol, 1.0);
-	gl_FragData[1] = vec4(fogCol, 1.0);
+	skyOut = vec4(fogCol, 1.0);
+	fogOut = vec4(fogCol, 1.0);
 }

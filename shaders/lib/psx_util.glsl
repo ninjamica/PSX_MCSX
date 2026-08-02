@@ -1,6 +1,22 @@
 #ifndef PSX_UTIL
 #define PSX_UTIL
 
+float clamp01(float value) {
+	return clamp(value, 0.0, 1.0);
+}
+
+vec2 clamp01(vec2 value) {
+	return clamp(value, 0.0, 1.0);
+}
+
+vec3 clamp01(vec3 value) {
+	return clamp(value, 0.0, 1.0);
+}
+
+vec4 clamp01(vec4 value) {
+	return clamp(value, 0.0, 1.0);
+}
+
 vec4 PixelSnap(vec4 pos, float inaccuracy) {
 	inaccuracy += 0.1;
 	vec2 screenParams = vec2(1080, 1080);
