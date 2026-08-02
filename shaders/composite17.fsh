@@ -23,16 +23,16 @@ const bool colortex12Clear  = false;
 #include "/shaders.settings"
 
 #define DITHER_COLORS 128
-varying vec2 texcoord;
+// varying vec2 texcoord;
 
 uniform sampler2D colortex10;
 uniform sampler2D colortex1;
 uniform float viewWidth;
 uniform float viewHeight;
 
-vec3 GetDither(vec2 pos, vec3 c, float intensity) {
+vec3 GetDither(ivec2 pos, vec3 c, float intensity) {
 	int DITHER_THRESHOLDS[16] = int[]( -4, 0, -3, 1, 2, -2, 3, -1, -3, 1, -4, 0, 3, -1, 2, -2 );
-	int index = (int(pos.x) & 3) * 4 + (int(pos.y) & 3);
+	int index = (pos.x & 3) * 4 + (pos.y & 3);
 
 	c.xyz = clamp(c.xyz * (DITHER_COLORS-1) + DITHER_THRESHOLDS[index] * (intensity * 100), vec3(0), vec3(DITHER_COLORS-1));
 
@@ -42,20 +42,17 @@ vec3 GetDither(vec2 pos, vec3 c, float intensity) {
 
 /* RENDERTARGETS: 10 */
 void main() {
-	// ivec2 screenRes = ivec2(viewWidth, viewHeight) * resolution_scale
+	ivec2 downscaleCoord = ivec2(gl_FragCoord.xy * resolution_scale);
 
-	vec2 dsRes = vec2(viewWidth, viewHeight) * resolution_scale;
-	vec2 downscale = (floor(texcoord * dsRes) + 0.5) / dsRes;
-
-	vec2 textCol     = texture2D(colortex1, texcoord).rg;
-	vec2 textColDown = texture2D(colortex1, downscale).rg;
+	vec2 textCol     = texelFetch(colortex1, ivec2(gl_FragCoord.xy), 0).rg;
+	vec2 textColDown = texelFetch(colortex1, downscaleCoord, 0).rg;
 	if(textCol.r > 0.5 || textColDown.r > 0.5)
-		downscale = texcoord;
+		downscaleCoord = ivec2(gl_FragCoord.xy);
 
-    vec3 col = texture2D(colortex10,downscale).rgb;
+    vec3 col = texelFetch(colortex10, ivec2(downscaleCoord / resolution_scale), 0).rgb;
 
 	col = clamp(1.2 * (col - 0.5) + 0.5, 0, 1);
-	col = GetDither(downscale * dsRes + 0.1, col, dither_amount);
+	col = GetDither(downscaleCoord, col, dither_amount);
 	col = clamp(floor(col * color_depth) / color_depth, 0.0, 1.0);
 
 	gl_FragData[0].rgb = col;
