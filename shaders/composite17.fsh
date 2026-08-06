@@ -44,14 +44,16 @@ vec3 GetDither(ivec2 pos, vec3 c, float intensity) {
 layout(location = 0) out vec4 colorOut;
 
 void main() {
+	ivec2 nativeCoord = ivec2(gl_FragCoord.xy);
 	ivec2 downscaleCoord = ivec2(gl_FragCoord.xy * resolution_scale);
+	ivec2 rescaleCoord = ivec2(downscaleCoord / resolution_scale);
 
-	vec2 textCol     = texelFetch(colortex1, ivec2(gl_FragCoord.xy), 0).rg;
-	vec2 textColDown = texelFetch(colortex1, downscaleCoord, 0).rg;
+	vec2 textCol     = texelFetch(colortex1, nativeCoord, 0).rg;
+	vec2 textColDown = texelFetch(colortex1, rescaleCoord, 0).rg;
 	if(textCol.r > 0.5 || textColDown.r > 0.5)
-		downscaleCoord = ivec2(gl_FragCoord.xy);
+		rescaleCoord = nativeCoord;
 
-    vec3 col = texelFetch(colortex10, ivec2(downscaleCoord / resolution_scale), 0).rgb;
+    vec3 col = texelFetch(colortex10, rescaleCoord, 0).rgb;
 
 	col = clamp01(1.2 * (col - 0.5) + 0.5);
 	col = GetDither(downscaleCoord, col, dither_amount);
