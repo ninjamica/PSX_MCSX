@@ -13,12 +13,10 @@ varying vec4 color;
 
 attribute vec4 mc_Entity;
 attribute vec3 at_midBlock;
-attribute vec2 mc_midTexCoord;
 
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
 uniform sampler2D lightmap;
-uniform ivec2 atlasSize;
 
 #if Floodfill > 0
 	varying vec3 voxelLightColor;
@@ -47,7 +45,7 @@ void main() {
 	float wVal = (mat3(gl_ProjectionMatrix) * position).z;
 	wVal = clamp(wVal, -10000.0, 0.0);
 	texcoordAffine = vec3(texcoord * wVal, wVal);
-	texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
+	texcoordAffine.xy -= sign(0.5 - texcoord) * 0.001;
 
 	gl_Position = position4;
 
