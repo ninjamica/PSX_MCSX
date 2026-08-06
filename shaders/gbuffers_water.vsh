@@ -16,6 +16,7 @@ varying float isWaterBackface;
 attribute vec4 mc_Entity;
 attribute vec3 at_midBlock;
 attribute vec4 at_tangent;
+attribute vec2 mc_midTexCoord;
 
 uniform float frameTimeCounter;
 uniform vec3 cameraPosition;
@@ -24,6 +25,7 @@ uniform sampler2D lightmap;
 uniform int isEyeInWater;
 uniform mat4 gbufferModelViewInverse;
 uniform int frameCounter;
+uniform ivec2 atlasSize;
 
 #if Floodfill > 0
 	varying vec3 voxelLightColor;
@@ -64,6 +66,7 @@ void main() {
 	float wVal = (mat3(gl_ProjectionMatrix) * position).z;
 	wVal = clamp(wVal, -10000.0, 0.0);
 	texcoordAffine = vec3(texcoord * wVal, wVal);
+	texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
 	
 	gl_Position = position4;
 

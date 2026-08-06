@@ -10,7 +10,7 @@ varying vec3 viewPos;
 #include "/lib/psx_util.glsl"
 #include "/lib/voxel.glsl"
 
-uniform vec2 texelSize;
+uniform ivec2 atlasSize;
 uniform sampler2D texture;
 uniform sampler2D lightmap;
 
@@ -38,7 +38,7 @@ layout(location = 0) out vec4 colorOut;
 layout(location = 1) out vec4 textOut;
 
 void main() {
-	vec2 affine = AffineMapping(texcoordAffine, texcoord, texelSize, 2);
+	vec2 affine = AffineMapping(texcoordAffine, texcoord, 1.0 / atlasSize, 2);
 	colorOut = texture2D(texture, texcoord) * color;
 
 	#if Floodfill > 0 && defined Floodfill_Particles

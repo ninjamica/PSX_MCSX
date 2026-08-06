@@ -93,6 +93,7 @@ void main() {
 	float wVal = (mat3(gl_ProjectionMatrix) * position).z;
 	wVal = clamp(wVal, 0.0, 10000.0);
 	texcoordAffine = vec3(texcoord * wVal, wVal);
+	texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
 	
 	gl_Position = gl_ProjectionMatrix * vec4(position, 1.0);
 

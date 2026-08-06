@@ -12,7 +12,7 @@ varying vec2 lmcoord;
 varying vec4 color;
 varying vec3 viewPos;
 
-uniform vec2 texelSize;
+uniform ivec2 atlasSize;
 uniform vec4 entityColor;
 uniform float frameTimeCounter;
 uniform int entityId;
@@ -49,13 +49,13 @@ layout(location = 1) out vec4 textOut;
 
 void main() {
 	#ifdef affine_mapping
-	#ifdef affine_clamp_enabled
-	vec2 affine = AffineMapping(texcoordAffine, texcoord, texelSize, affine_clamp * 4.0);
-	#else
-	vec2 affine = texcoordAffine.xy / texcoordAffine.z;
-	#endif
+		#ifdef affine_clamp_enabled
+			vec2 affine = AffineMapping(texcoordAffine, texcoord, 1.0 / atlasSize, affine_clamp * 4.0);
+		#else
+			vec2 affine = texcoordAffine.xy / texcoordAffine.z;
+		#endif
 	#else 
-	vec2 affine = texcoord;
+		vec2 affine = texcoord;
 	#endif
 
 	if(entityId == 10001) {

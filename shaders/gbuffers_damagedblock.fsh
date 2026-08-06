@@ -5,7 +5,7 @@
 #include "/lib/psx_util.glsl"
 #include "/lib/voxel.glsl"
 
-uniform vec2 texelSize;
+uniform ivec2 atlasSize;
 uniform sampler2D texture;
 uniform sampler2D lightmap;
 uniform float alphaTestRef;
@@ -25,13 +25,13 @@ layout(location = 0) out vec4 colorOut;
 void main() {
 
 	#ifdef affine_mapping
-	#ifdef affine_clamp_enabled
-	vec2 affine = AffineMapping(texcoordAffine, texcoord, texelSize, affine_clamp);
-	#else
-	vec2 affine = texcoordAffine.xy / texcoordAffine.z;
-	#endif
+		#ifdef affine_clamp_enabled
+			vec2 affine = AffineMapping(texcoordAffine, texcoord, 1.0 / atlasSize, affine_clamp);
+		#else
+			vec2 affine = texcoordAffine.xy / texcoordAffine.z;
+		#endif
 	#else 
-	vec2 affine = texcoord;
+		vec2 affine = texcoord;
 	#endif
 
 	#if Floodfill > 0

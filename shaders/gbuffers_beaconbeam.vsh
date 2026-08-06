@@ -6,6 +6,8 @@
 #include "/lib/psx_util.glsl"
 #include "/lib/voxel.glsl"
 
+attribute vec2 mc_midTexCoord;
+
 varying vec2 texcoord;
 varying vec3 texcoordAffine;
 varying vec2 lmcoord;
@@ -16,6 +18,7 @@ uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
 uniform mat4 gbufferModelViewInverse;
 uniform sampler2D lightmap;
+uniform ivec2 atlasSize;
 
 
 #if Floodfill > 0 && defined Floodfill_Particles
@@ -33,6 +36,7 @@ void main() {
 	float wVal = (mat3(gl_ProjectionMatrix) * position).z;
 	wVal = clamp(wVal, -10000.0, 0.0);
 	texcoordAffine = vec3(texcoord * wVal, wVal);
+	texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
 
 	color = gl_Color;
 	
