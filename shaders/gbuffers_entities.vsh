@@ -97,7 +97,7 @@ void main() {
 	if (atlasSize.x > 0)
 		texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
 	else
-		texcoordAffine.xy -= sign(0.5 - texcoord) * 0.001;
+		texcoordAffine.xy += sign(mc_midTexCoord - texcoord) * 0.00001;
 	
 	gl_Position = gl_ProjectionMatrix * vec4(position, 1.0);
 

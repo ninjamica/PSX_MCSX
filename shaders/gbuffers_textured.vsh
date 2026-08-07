@@ -36,7 +36,11 @@ void main() {
 	float wVal = (mat3(gl_ProjectionMatrix) * position).z;
 	wVal = clamp(wVal, -10000.0, 0.0);
 	texcoordAffine = vec3(texcoord * wVal, wVal);
-	texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
+	
+	if (atlasSize.x > 0)
+		texcoordAffine.xy -= sign(mc_midTexCoord - texcoord) * 0.001/atlasSize;
+	else
+		texcoordAffine.xy += sign(mc_midTexCoord - texcoord) * 0.00001;
 
 	color = gl_Color;
 	
