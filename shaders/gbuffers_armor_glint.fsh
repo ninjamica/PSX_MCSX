@@ -5,9 +5,9 @@
 #include "/lib/psx_util.glsl"
 
 
-varying vec4 color;
-varying vec2 texcoord;
-varying vec3 viewPos;
+in vec4 color;
+in vec2 texcoord;
+in vec3 viewPos;
 
 uniform sampler2D texture;
 uniform float rainStrength;

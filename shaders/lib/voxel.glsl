@@ -1,13 +1,6 @@
-#define Floodfill 2 // Mode for Floodfill colored lighting. Off: use vanilla lighting, fastest. Slow: light propogates one block per frame, slightly faster than instant. Instant: light propogates instantly, slowest. [0 1 2]
+#include "/shaders.settings"
 
-#define voxelMapResolution 2048 // [1024 2048 4096]
 const int xzRadiusBlocks = voxelMapResolution / 32;
-
-#define Floodfill_Brightness 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-#define Floodfill_SkyLightFactor 0.7 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-#define Floodfill_Instant
-// #define Floodfill_Particles
-// #define Floodfill_HeltItemLight
 
 /*
 #ifdef Floodfill_HeltItemLight

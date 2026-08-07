@@ -40,5 +40,5 @@ void main() {
 	float fogDepth = getFogDepth(viewPos, gl_FragCoord.z, isEyeInWater, near, far);
 	colorOut.rgb = mix(colorOut.rgb, fogCol, fogDepth);
 	
-	textOut = vec4(0.0);
+	textOut = vec4(0.0, 0.0, 0.0, 1.0);
 }
